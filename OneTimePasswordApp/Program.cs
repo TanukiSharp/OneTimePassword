@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using OneTimePassword;
 
-namespace OneTimePasswordTester
+namespace OneTimePasswordApp
 {
     public class Program
     {

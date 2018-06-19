@@ -1,7 +1,3 @@
 .vs/
-src/OneTimePassword/bin/
-src/OneTimePassword/obj/
-src/OneTimePasswordTester/bin/
-src/OneTimePasswordTester/obj/
-*.xproj.user
-project.lock.json
+bin/
+obj/
