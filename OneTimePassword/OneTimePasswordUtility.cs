@@ -21,7 +21,7 @@ namespace OneTimePassword
             if (digitCount < 1 || digitCount > 8)
                 throw new ArgumentException($"Invalid '{nameof(digitCount)}' argument. It must be in range [1, 8].", nameof(digitCount));
 
-            var diff = password.Length - digitCount;
+            int diff = password.Length - digitCount;
 
             if (diff > 0)
                 return password.Substring(diff);

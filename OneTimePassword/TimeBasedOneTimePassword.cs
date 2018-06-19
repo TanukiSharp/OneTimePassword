@@ -67,9 +67,7 @@ namespace OneTimePassword
             if (string.IsNullOrWhiteSpace(secret))
                 throw new ArgumentException($"Invalid '{nameof(secret)}' argument.");
 
-            var base32Encoder = new Base32Encoder();
-
-            byte[] secretData = base32Encoder.Decode(secret);
+            byte[] secretData = Base32Encoder.Decode(secret);
 
             if (hmacAlgorithm == HmacAlgorithmType.SHA1)
                 hashAlgoritm = new HMACSHA1(secretData);
@@ -80,17 +78,17 @@ namespace OneTimePassword
             else
                 throw new ArgumentException($"Invalid '{nameof(hmacAlgorithm)}' argument. Unknown value.", nameof(hmacAlgorithm));
 
-            var timeData = BitConverter.GetBytes(GetTimeStep(time));
+            byte[] timeData = BitConverter.GetBytes(GetTimeStep(time));
 
             // swap time
             for (int i = 0; i < 4; i++)
             {
-                var temp = timeData[i];
+                byte temp = timeData[i];
                 timeData[i] = timeData[7 - i];
                 timeData[7 - i] = temp;
             }
 
-            var hash = hashAlgoritm.ComputeHash(timeData);
+            byte[] hash = hashAlgoritm.ComputeHash(timeData);
 
             int offset = hash[hash.Length - 1] & 0xF;
 

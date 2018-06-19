@@ -7,7 +7,7 @@ namespace OneTimePassword
     /// <summary>
     /// An Base32 encode/decoder.
     /// </summary>
-    public class Base32Encoder
+    public static class Base32Encoder
     {
         /// <summary>
         /// Encodes a binary data into a base32 string.
@@ -15,7 +15,7 @@ namespace OneTimePassword
         /// <param name="data">Binary data to encode.</param>
         /// <param name="base32CharCount">The number of 5-bits characters contained in the input <paramref name="data"/>.</param>
         /// <returns>Returns a base32 encoded string.</returns>
-        public string Encode(byte[] data, int base32CharCount)
+        public static string Encode(byte[] data, int base32CharCount)
         {
             int k = 0;
             var bits = new bool[base32CharCount * 5];
@@ -56,7 +56,7 @@ namespace OneTimePassword
         /// </summary>
         /// <param name="base32">The base32 encoded string to decode.</param>
         /// <returns>Returns a decoded binary data.</returns>
-        public byte[] Decode(string base32)
+        public static byte[] Decode(string base32)
         {
             var unspacedDecoded = base32
                 .Where(x => char.IsWhiteSpace(x) == false)
