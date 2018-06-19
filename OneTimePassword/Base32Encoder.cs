@@ -75,17 +75,21 @@ namespace OneTimePassword
 
             int remain;
             int byteSize = MathDivRem(bits.Length, 8, out remain);
+
             if (remain > 0)
                 byteSize++;
 
             k = 0;
+
             int n = 0;
             byte currentByte = 0;
             var result = new byte[byteSize];
+
             for (int i = 0; i < bits.Length; i++)
             {
                 if (bits[i])
                     currentByte |= (byte)(1 << (7 - k));
+
                 k++;
 
                 if (k >= 8 || i == bits.Length - 1)
