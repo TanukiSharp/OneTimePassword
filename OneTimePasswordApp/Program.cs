@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -39,7 +40,7 @@ namespace OneTimePasswordApp
 
             while (isRunning)
             {
-                string result = otp.GenerateOneTimePassword();
+                string result = otp.GenerateOneTimePassword(GetTimestamp(), hmacAlgorithmType);
                 result = OneTimePasswordUtility.Truncate(result, truncate);
 
                 if (result != previous)
@@ -64,6 +65,14 @@ namespace OneTimePasswordApp
             return 0;
         }
 
+        private DateTime GetTimestamp()
+        {
+            if (isFixedTimestamp)
+                return fixedTimestamp;
+
+            return DateTime.UtcNow.AddSeconds(deltaSeconds);
+        }
+
         private void PrintSplit(string value, int split)
         {
             int k = 0;
@@ -81,6 +90,10 @@ namespace OneTimePasswordApp
         private bool noInnerSpace;
         private string secretValue;
         private int truncate = 6;
+        private HmacAlgorithmType hmacAlgorithmType = HmacAlgorithmType.SHA1;
+        private bool isFixedTimestamp = false;
+        private DateTime fixedTimestamp;
+        private int deltaSeconds = 0;
 
         private void PrintUsage()
         {
@@ -88,16 +101,30 @@ namespace OneTimePasswordApp
 
             Console.WriteLine($"{asnName.Name} v{asnName.Version}");
             Console.WriteLine();
-            Console.WriteLine("--secretFile <file>      Absolute or relative filename containing the secret text");
-            Console.WriteLine("--secret <secret>        Secret text (--secretFile takes precedence if given)");
-            Console.WriteLine("--trucate <number>       Truncates the OTP to <number> digits (defaults to 6)");
-            Console.WriteLine("--once                   Prints OTP only once and without line feed (defaults to unset)");
-            Console.WriteLine("--no-inner-spaces        OTP is printed without any spaces (defaults to unset)");
+            Console.WriteLine("  --secretFile <file>            Absolute or relative file containing the secret text");
+            Console.WriteLine("  --secret <secret>              Secret text (--secretFile takes precedence if given)");
+            Console.WriteLine();
+            Console.WriteLine("  Arguments --secretFile and --secret are mutually exclusive, but one of them must be given");
+            Console.WriteLine();
+            Console.WriteLine("  --hmac <hamc>                  HMAC algorithm to use, available values are SHA1, SHA256 and SHA512 (defaults to SHA1)");
+            Console.WriteLine("  --time <offset> | <datetime>   Positive or negative offset in seconds from UTC now, or fixed UTC date and time");
+            Console.WriteLine("  --trucate <number>             Truncates the OTP to <number> digits (defaults to 6)");
+            Console.WriteLine("  --once                         Prints OTP only once and without line feed (defaults to unset)");
+            Console.WriteLine("  --no-inner-spaces              OTP is printed without any spaces (defaults to unset)");
+            Console.WriteLine();
+            Console.WriteLine("  -h | -? | --help               Prints this help usage");
+            Console.WriteLine();
         }
 
         private bool ParseArguments(string[] args)
         {
             int index;
+
+            if (args.Length < 2)
+            {
+                PrintUsage();
+                return false;
+            }
 
             if (args.Contains("-h") || args.Contains("--help") || args.Contains("--herp") || args.Contains("-?"))
             {
@@ -107,6 +134,63 @@ namespace OneTimePasswordApp
 
             onlyOnce = args.Contains("--once");
             noInnerSpace = args.Contains("--no-inner-space") || args.Contains("--no-inner-spaces");
+
+            index = Array.IndexOf(args, "--hmac");
+            if (index >= 0)
+            {
+                if (index < args.Length - 1)
+                {
+                    switch (args[index + 1].ToLower())
+                    {
+                        case "sha1":
+                            hmacAlgorithmType = HmacAlgorithmType.SHA1;
+                            break;
+                        case "sha256":
+                            hmacAlgorithmType = HmacAlgorithmType.SHA256;
+                            break;
+                        case "sha512":
+                            hmacAlgorithmType = HmacAlgorithmType.SHA512;
+                            break;
+                        default:
+                            Console.WriteLine($"Invalid 'hmac' value '{args[index + 1]}', fallback to default value '{hmacAlgorithmType}'");
+                            break;
+                    }
+                }
+                else
+                    Console.WriteLine($"Missing value of 'hmac' argument");
+            }
+
+            index = Array.IndexOf(args, "--time");
+            if (index >= 0)
+            {
+                if (index < args.Length - 1)
+                {
+                    string timeStr = args[index + 1];
+
+                    void ParseTimeInt(string str)
+                    {
+                        if (int.TryParse(str, out int localDeltaSeconds) == false)
+                            Console.WriteLine($"Invalid 'time' value '{timeStr}', fallback to default value '(current UTC time)'");
+                        else
+                            deltaSeconds = localDeltaSeconds;
+                    }
+
+                    if (timeStr.StartsWith('+') || timeStr.StartsWith('-'))
+                        ParseTimeInt(timeStr);
+                    else
+                    {
+                        if (DateTime.TryParse(timeStr, null, DateTimeStyles.AdjustToUniversal, out DateTime localFixedTimestamp) == false)
+                            ParseTimeInt(timeStr);
+                        else
+                        {
+                            fixedTimestamp = localFixedTimestamp;
+                            isFixedTimestamp = true;
+                        }
+                    }
+                }
+                else
+                    Console.WriteLine($"Missing value of 'time' argument");
+            }
 
             index = Array.IndexOf(args, "--truncate");
             if (index >= 0)
@@ -165,6 +249,8 @@ namespace OneTimePasswordApp
                 else
                     Console.WriteLine($"Missing value of 'secret' argument");
             }
+
+            Console.WriteLine("Missing mandatory 'secretFile' or 'secret' argument");
 
             return false;
         }
