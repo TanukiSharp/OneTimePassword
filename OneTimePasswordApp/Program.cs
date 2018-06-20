@@ -27,7 +27,7 @@ namespace OneTimePasswordApp
 
             if (onlyOnce == false)
             {
-                Console.WriteLine("Press Ctrl+C key to exit");
+                Console.WriteLine("Press Esc key to exit");
                 Console.WriteLine();
                 Console.CancelKeyPress += (ss, ee) => { ee.Cancel = true; isRunning = false; };
             }
@@ -43,12 +43,51 @@ namespace OneTimePasswordApp
                 string result = otp.GenerateOneTimePassword(GetTimestamp(), hmacAlgorithmType);
                 result = OneTimePasswordUtility.Truncate(result, truncate);
 
+                string previousResult = null;
+                string nextResult = null;
+
+                if (showPrevious)
+                {
+                    previousResult = otp.GenerateOneTimePassword(GetTimestamp().AddSeconds(-30.0), hmacAlgorithmType);
+                    previousResult = OneTimePasswordUtility.Truncate(previousResult, truncate);
+                }
+
+                if (showNext)
+                {
+                    nextResult = otp.GenerateOneTimePassword(GetTimestamp().AddSeconds(+30.0), hmacAlgorithmType);
+                    nextResult = OneTimePasswordUtility.Truncate(nextResult, truncate);
+                }
+
                 if (result != previous)
                 {
                     if (split == 0 || noInnerSpace)
+                    {
+                        if (showPrevious)
+                            Console.Write($"<{previousResult}<  |  ");
+
                         Console.Write(result);
+
+                        if (showNext)
+                            Console.Write($"  |  >{nextResult}>");
+                    }
                     else
+                    {
+                        if (showPrevious)
+                        {
+                            Console.Write("<");
+                            PrintSplit(previousResult, split);
+                            Console.Write("<  | ");
+                        }
+
                         PrintSplit(result, split);
+
+                        if (showNext)
+                        {
+                            Console.Write("  |  >");
+                            PrintSplit(nextResult, split);
+                            Console.Write(">");
+                        }
+                    }
 
                     if (onlyOnce)
                         break;
@@ -59,7 +98,27 @@ namespace OneTimePasswordApp
                 previous = result;
 
                 for (int i = 0; i < 10 && isRunning; i++)
+                {
+                    if (Console.KeyAvailable)
+                    {
+                        ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+
+                        if (keyInfo.Key == ConsoleKey.Enter)
+                            Console.WriteLine();
+                        else if (keyInfo.Key == ConsoleKey.Escape)
+                        {
+                            isRunning = false;
+                            break;
+                        }
+                        else
+                        {
+                            previous = null;
+                            break;
+                        }
+                    }
+
                     await Task.Delay(100);
+                }
             }
 
             return 0;
@@ -88,6 +147,9 @@ namespace OneTimePasswordApp
 
         private bool onlyOnce;
         private bool noInnerSpace;
+        private bool showPrevious;
+        private bool showNext;
+
         private string secretValue;
         private int truncate = 6;
         private HmacAlgorithmType hmacAlgorithmType = HmacAlgorithmType.SHA1;
@@ -111,6 +173,8 @@ namespace OneTimePasswordApp
             Console.WriteLine("  --trucate <number>             Truncates the OTP to <number> digits (defaults to 6)");
             Console.WriteLine("  --once                         Prints OTP only once and without line feed (defaults to unset)");
             Console.WriteLine("  --no-inner-spaces              OTP is printed without any spaces (defaults to unset)");
+            Console.WriteLine("  --prev                         Also prints previous OTP (defaults to unset)");
+            Console.WriteLine("  --next                         Also ptints next OTP (defaults to unset)");
             Console.WriteLine();
             Console.WriteLine("  -h | -? | --help               Prints this help usage");
             Console.WriteLine();
@@ -134,6 +198,9 @@ namespace OneTimePasswordApp
 
             onlyOnce = args.Contains("--once");
             noInnerSpace = args.Contains("--no-inner-space") || args.Contains("--no-inner-spaces");
+
+            showPrevious = args.Contains("--prev") || args.Contains("--previous");
+            showNext = args.Contains("--next");
 
             index = Array.IndexOf(args, "--hmac");
             if (index >= 0)
