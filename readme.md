@@ -8,7 +8,9 @@ By default, the tool prints the time-based one-time passwords continually until 
 
 This tool requires .NET Core 2.1 or higher to run.
 
-# Install
+# Install / Download
+
+## With .NET Core tool
 
 Run the following command:
 
@@ -18,7 +20,18 @@ dotnet tool install -g TanukiSharp.OneTimePassword
 
 Done.
 
-Read the [following article][10] for more information about .NET tools.
+Read the [following article][10] for more information about .NET Core tools.
+
+## Manually
+
+If you encounter troubles with .NET Core tool command or prefer to download manually, you can **[download the latest here](https://raw.githubusercontent.com/TanukiSharp/OneTimePassword/master/Builds/TanukiSharp.OneTimePassword_0.0.1.zip)**.
+
+If you need or want a previous version, you can find them all **[here](
+https://github.com/TanukiSharp/OneTimePassword/tree/master/Builds)**.
+
+## Using NuGet
+
+The package is available on NuGet for you to retrieve directly if needed, **[here](https://www.nuget.org/packages/TanukiSharp.OneTimePassword/0.0.1)**.
 
 # How to use
 
