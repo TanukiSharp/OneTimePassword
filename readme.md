@@ -6,6 +6,20 @@ You can find more information about this algorithm on [Wikipedia][3] and by read
 
 By default, the tool prints the time-based one-time passwords continually until you stops it. This behaviour can be tweaked with options.
 
+This tool requires .NET Core 2.1 or higher to run.
+
+# Install
+
+Run the following command:
+
+```
+dotnet tool install -g TanukiSharp.OneTimePassword
+```
+
+Done.
+
+Read the [following article][10] for more information about .NET tools.
+
 # How to use
 
 The first step to understand how the tool works is to run it without any argument. That will print the following usage:
@@ -141,3 +155,4 @@ A better implementation could allocate much less, but would require a bit more w
 [7]: https://en.wikipedia.org/wiki/SHA-2
 [8]: https://www.microsoft.com/net/
 [9]: https://docs.microsoft.com/en-us/dotnet/api/system.datetime.tryparse?view=netframework-4.7.2#System_DateTime_TryParse_System_String_System_DateTime__
+[10]: https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools
