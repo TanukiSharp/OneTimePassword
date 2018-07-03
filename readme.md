@@ -6,7 +6,7 @@ You can find more information about this algorithm on [Wikipedia][3] and by read
 
 By default, the tool prints the time-based one-time passwords continually until you stops it. This behaviour can be tweaked with options.
 
-This tool requires .NET Core 2.1 or higher to run.
+This tool requires [.NET Core][11] 2.1 or higher to run.
 
 # Install / Download
 
@@ -20,11 +20,11 @@ dotnet tool install -g TanukiSharp.OneTimePassword
 
 Done.
 
-Read the [following article][10] for more information about .NET Core tools.
+Read the [following article][10] for more information about [.NET Core][11] tools.
 
 ## Manually
 
-If you encounter troubles with .NET Core tool command or prefer to download manually, you can **[download the latest here](https://raw.githubusercontent.com/TanukiSharp/OneTimePassword/master/Builds/TanukiSharp.OneTimePassword_0.0.1.zip)**.
+If you encounter troubles with [.NET Core][11] tool command or prefer to download manually, you can **[download the latest here](https://raw.githubusercontent.com/TanukiSharp/OneTimePassword/master/Builds/TanukiSharp.OneTimePassword_0.0.1.zip)**.
 
 If you need or want a previous version, you can find them all **[here](
 https://github.com/TanukiSharp/OneTimePassword/tree/master/Builds)**.
@@ -169,3 +169,4 @@ A better implementation could allocate much less, but would require a bit more w
 [8]: https://www.microsoft.com/net/
 [9]: https://docs.microsoft.com/en-us/dotnet/api/system.datetime.tryparse?view=netframework-4.7.2#System_DateTime_TryParse_System_String_System_DateTime__
 [10]: https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools
+[11]: https://www.microsoft.com/net/learn/get-started
